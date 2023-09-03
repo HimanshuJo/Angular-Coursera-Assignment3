@@ -1,0 +1,50 @@
+<!doctype html>
+<html ng-app="ShoppingListPromiseApp" lang="en">
+
+<head>
+  <title>Narrow Down Your Menu Choice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles/bootstrap.min.css">
+  <link rel="stylesheet" href="styles/styles.css">
+  <script src="angular.min.js"></script>
+  <script src="app.js"></script>
+</head>
+
+<body>
+  <div ng-controller="ShoppingListController as menu" class="container">
+    <h1>Narrow Down Your Chinese Menu Choice</h1>
+
+    <h3>
+      List of Menu Categories
+    </h3>
+    <ul>
+      <li ng-repeat="category in menu.categories">
+        {{category}}
+      </li>
+    </ul>
+
+    <div class="form-group">
+      <input ng-model="menu.itemName" type="text" placeholder="search term" class="form-control">
+
+    </div>
+    <div class="form-group narrow-button">
+      <button ng-click="menu.addItem();" class="btn btn-primary">Narrow It Down For Me!</button>
+    </div>
+    <br>
+    <hr>
+    <div class="container">
+      <ol>
+        <li ng-repeat="item in menu.items">
+          {{item.menu}}<br>
+          {{item.short_name}}<br>
+          {{item.description}}
+        </li>
+      </ol>
+    </div>
+
+    <found-items found-items="...." on-remove="...."></found-items>
+  </div>
+
+</body>
+
+</html>
