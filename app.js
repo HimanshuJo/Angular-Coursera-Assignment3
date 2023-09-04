@@ -13,16 +13,16 @@
             template: '<br>\
             <hr>\
             <div class="container">\
-                <ol>\
-                <li ng-repeat="item in menu.items">\
-                {{item.menu}}<br>\
-                {{item.short_name}}<br>\
-                {{item.description}}\
-                <button ng-click="menu.removeItem({index: $index});">Don\'t want this one!</button>\
-                </li>\
-                </ol>\
-                </div>\
-                <div ng-if="menu.items.length==0&&menu.counter>=1">Nothing found</div>',
+            <ol>\
+            <li ng-repeat="item in menu.items">\
+            {{item.menu}}<br>\
+            {{item.short_name}}<br>\
+            {{item.description}}\
+            <button ng-click="menu.removeItem({index: $index});">Don\'t want this one!</button>\
+            </li>\
+            </ol>\
+            </div>\
+            <div ng-if="menu.items.length==0&&menu.counter>=1">Nothing found</div>',
             scope: {
                 menu: '<',
                 removeItem: '&'
@@ -66,7 +66,7 @@
         list.addItem = function () {
             list.items.splice(0, list.items.length);
             if(list.itemName===""){
-                list.itemName="#######";
+                list.itemName="### --- ###";
             }
             NarrowItDownService.addItem_version2(list.itemName);
             list.itemName="";
@@ -97,7 +97,7 @@
             }, function (errorResponse) {
                 console.log("Error 2: " + errorResponse.message);
             }).catch(function (errorResponse) {
-                console.log("Erro 3: " + errorResponse.message);
+                console.log("Error 3: " + errorResponse.message);
             });
         };
 
@@ -131,8 +131,6 @@
                         for (let [key3, value3] of entries3) {
                             const entries4 = Object.entries(value3);
                             for (let [key4, value4] of entries4) {
-                                let tochk1 = "";
-                                tochk1 = key3.toString();
                                 if (key4 === "name") {
                                     curmenu = value4.toString();
                                 }
