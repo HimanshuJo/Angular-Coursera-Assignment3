@@ -119,7 +119,6 @@
             let deferred = $q.defer();
             let flag = false;
 
-
             $timeout(function () {
 
                 const entries = Object.entries(response.data);
@@ -130,16 +129,18 @@
                     for (let [key2, value2] of entries2) {
                         const entries3 = Object.entries(value2);
                         for (let [key3, value3] of entries3) {
-                            let tochk1 = "";
-                            tochk1 = key3.toString();
-                            if (tochk1 === "name") {
-                                curmenu = value3.valueOf().toString();
-                            }
-                            if (tochk1 === "short_name") {
-                                curshortname = value3.valueOf().toString();
-                            }
                             const entries4 = Object.entries(value3);
                             for (let [key4, value4] of entries4) {
+                                let tochk1 = "";
+                                tochk1 = key3.toString();
+                                if (key4 === "name") {
+                                    curmenu = value4.toString();
+                                }
+                                if (key4 === "short_name") {
+                                    curshortname = value4.toString();
+                                }
+                            }
+                            for(let [key4, value4] of entries4){
                                 if (key4 === "description") {
                                     if (value4.indexOf(name) !== -1) {
                                         flag = true;
