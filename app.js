@@ -1,14 +1,39 @@
 (function () {
     'use strict';
-    angular.module('ShoppingListPromiseApp', [])
-        .controller('ShoppingListController', ShoppingListController)
-        .service('ShoppingListService', ShoppingListService)
-        .service('WeightLossFilterService', WeightLossFilterService)
-        .service('MenuCategoriesService', MenuCategoriesService)
+    angular.module('NarrowItDownApp', [])
+        .controller('NarrowItDownController', NarrowItDownController)
+        .service('NarrowItDownService', NarrowItDownService)
+        .service('NarrowItDownFilterService', NarrowItDownFilterService)
+        .service('NarrowItDownAPIService', NarrowItDownAPIService)
+        .directive('foundItems', FoundItems)
         .constant('ApiBasePath', " https://coursera-jhu-default-rtdb.firebaseio.com/menu_items.json");
 
-    MenuCategoriesService.$inject = ['$http', 'ApiBasePath'];
-    function MenuCategoriesService($http, ApiBasePath) {
+    function FoundItems() {
+        var ddo = {
+            template: '<br>\
+            <hr>\
+            <div class="container">\
+                <ol>\
+                <li ng-repeat="item in menu.items">\
+                {{item.menu}}<br>\
+                {{item.short_name}}<br>\
+                {{item.description}}\
+                <button ng-click="menu.removeItem({index: $index});">Don\'t want this one!</button>\
+                </li>\
+                </ol>\
+                </div>\
+                <div ng-if="menu.items.length==0&&menu.counter>=1">Nothing found</div>',
+            scope: {
+                menu: '<',
+                removeItem: '&'
+            },
+        };
+
+        return ddo;
+    }
+
+    NarrowItDownAPIService.$inject = ['$http', 'ApiBasePath'];
+    function NarrowItDownAPIService($http, ApiBasePath) {
         let service = this;
 
         service.getMenuCategories = function () {
@@ -31,44 +56,48 @@
         };
     };
 
-    ShoppingListController.$inject = ['ShoppingListService'];
-    function ShoppingListController(ShoppingListService) {
+    NarrowItDownController.$inject = ['NarrowItDownService'];
+    function NarrowItDownController(NarrowItDownService) {
         let list = this;
-        list.items = ShoppingListService.getItems();
-        list.itemName = "";
-        list.itemQuantity = "";
+        list.items = NarrowItDownService.getItems();
+        list.itemName;
+        list.counter = 0;
 
         list.addItem = function () {
-            ShoppingListService.addItem_version2(list.itemName, list.itemQuantity);
+            list.items.splice(0, list.items.length);
+            if(list.itemName===""){
+                list.itemName="#######";
+            }
+            NarrowItDownService.addItem_version2(list.itemName);
+            list.itemName="";
         };
 
         list.removeItem = function (itemIndex) {
-            ShoppingListService.removeItem(itemIndex);
+            NarrowItDownService.removeItem(itemIndex);
         };
+
+        list.setCounter = function () {
+            list.counter++;
+        }
     };
 
-    ShoppingListService.$inject = ['$q', 'WeightLossFilterService', 'MenuCategoriesService'];
-    function ShoppingListService($q, WeightLossFilterService, MenuCategoriesService) {
+    NarrowItDownService.$inject = ['$q', 'NarrowItDownFilterService', 'NarrowItDownAPIService'];
+    function NarrowItDownService($q, NarrowItDownFilterService, NarrowItDownAPIService) {
         let service = this;
         let items = [];
 
-        service.addItem_version2 = function (name, quantity) {
-            let promise = MenuCategoriesService.getMenuCategories();
+        service.addItem_version2 = function (name) {
+            let promise = NarrowItDownAPIService.getMenuCategories();
             promise.then(function (response) {
-                return WeightLossFilterService.checkName(name, response);
+                return NarrowItDownFilterService.checkName(name, response, items);
             }, function (errorResponse) {
-                console.log(errorResponse.message);
+                console.log("Error 1: " + errorResponse.message);
             }).then(function (response) {
-                let item = {
-                    menu: response.menu,
-                    short_name: response.short_name,
-                    description: response.description
-                };
-                items.push(item);
+
             }, function (errorResponse) {
-                console.log(errorResponse.message);
+                console.log("Error 2: " + errorResponse.message);
             }).catch(function (errorResponse) {
-                console.log(errorResponse.message);
+                console.log("Erro 3: " + errorResponse.message);
             });
         };
 
@@ -81,21 +110,15 @@
         };
     };
 
-    WeightLossFilterService.$inject = ['$q', '$timeout'];
-    function WeightLossFilterService($q, $timeout) {
+    NarrowItDownFilterService.$inject = ['$q', '$timeout'];
+    function NarrowItDownFilterService($q, $timeout) {
         let service = this;
 
-        service.checkName = function (name, response) {
-            console.log(response);
+        service.checkName = function (name, response, items) {
+            //console.log(response);
             let deferred = $q.defer();
-
             let flag = false;
 
-            let result = {
-                menu: "",
-                short_name: "",
-                description: ""
-            };
 
             $timeout(function () {
 
@@ -119,45 +142,25 @@
                             for (let [key4, value4] of entries4) {
                                 if (key4 === "description") {
                                     if (value4.indexOf(name) !== -1) {
-                                        result.menu = curmenu;
-                                        result.short_name = curshortname;
-                                        result.description = value4;
                                         flag = true;
-                                        break;
+                                        items.push({
+                                            menu: curmenu,
+                                            short_name: curshortname,
+                                            description: value4
+                                        });
                                     }
                                 }
                             }
-                            if (flag) break;
                         }
-                        if (flag) break;
                     }
-                    if (flag) break;
                 }
                 if (flag) {
-                    deferred.resolve(result);
+                    deferred.resolve();
                 } else {
-                    deferred.reject(result);
+                    deferred.reject();
                 }
-            }, 3000);
+            }, 1);
             return deferred.promise;
         };
-
-        service.checkQuantity = function (quantity) {
-            let deferred = $q.defer();
-
-            let result = {
-                message: ""
-            };
-
-            $timeout(function () {
-                if (quantity < 6) {
-                    deferred.resolve(result);
-                } else {
-                    result.message = "Too much!";
-                    deferred.reject(result);
-                }
-            }, 1000);
-            return deferred.promise;
-        }
     };
 })();

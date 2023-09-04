@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="ShoppingListPromiseApp" lang="en">
+<html ng-app="NarrowItDownApp" lang="en">
 
 <head>
   <title>Narrow Down Your Menu Choice</title>
@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <div ng-controller="ShoppingListController as menu" class="container">
+  <div ng-controller="NarrowItDownController as menu" class="container">
     <h1>Narrow Down Your Chinese Menu Choice</h1>
 
     <h3>
@@ -25,24 +25,15 @@
 
     <div class="form-group">
       <input ng-model="menu.itemName" type="text" placeholder="search term" class="form-control">
-
     </div>
     <div class="form-group narrow-button">
-      <button ng-click="menu.addItem();" class="btn btn-primary">Narrow It Down For Me!</button>
-    </div>
-    <br>
-    <hr>
-    <div class="container">
-      <ol>
-        <li ng-repeat="item in menu.items">
-          {{item.menu}}<br>
-          {{item.short_name}}<br>
-          {{item.description}}
-        </li>
-      </ol>
+      <button ng-click="menu.addItem(); menu.setCounter(); menu.clearItem();" class="btn btn-primary">Narrow It Down
+        For Me!</button>
     </div>
 
-    <found-items found-items="...." on-remove="...."></found-items>
+    <br>
+    <br>
+    <found-items menu="menu" on-remove="menu.removeItem(index)"></found-items>
   </div>
 
 </body>
